@@ -91,11 +91,31 @@ class Scanner {
 
 
             default:
-                Lox.error(line, "Unexpected character.");
+                if (isDigit(c)) {
+                    number();
+                } else {
+                    Lox.error(line, "Unexpected character.");
+                }
                 break;
 
         }
 
+    }
+
+    //similar to strings
+    private void number() {
+        while (isDigit(peek())) advance();
+
+        // Look for a fractional part.
+        if (peek() == '.' && isDigit(peekNext())) {
+            // Consume the "."
+            advance();
+
+            while (isDigit(peek())) advance();
+        }
+
+        addToken(TokenType.NUMBER,
+                Double.parseDouble(source.substring(start, current)));
     }
 
     private void string() {
@@ -124,8 +144,10 @@ class Scanner {
     private char advance() {
         /*
         var counter = 1;
-        System.out.println(counter++);
-        System.out.println(counter++);
+        System.out.println(counter++); // 1 (returned first then incremented)
+        System.out.println(counter++); // 2
+        var anotherCounter = 1;
+        System.out.println(++counter); // 2 (incremented first then returned)
          */
         return source.charAt(current++);
     }
@@ -149,9 +171,23 @@ class Scanner {
     }
 
     // lookahead
+    // making peek take a parameter would allow arbitrarily far lookaheads
+    // although it's possible to provide a boolean parameter?
     private char peek() {
         if (isAtEnd()) return '\0';
         return source.charAt(current);
+    }
+    // we need a second character of lookahead when workijng with decimal numbers
+    private char peekNext() {
+        if (current + 1 >= source.length()) return '\0';
+        return source.charAt(current + 1);
+    }
+    /*
+    Java's Character.isDigit() allows Devangaeru digits,
+    full-width (Chinese, JP, KR) numbers and other stuff we don't want
+     */
+    private boolean isDigit(char c) {
+        return c >= '0' && c <= '9';
     }
 
 }
