@@ -24,6 +24,28 @@ class Scanner {
     private int current = 0;
     private int line = 1;
 
+    private static final Map<String, TokenType> keywords;
+
+    static {
+        keywords = new HashMap<>();
+        keywords.put("and", TokenType.AND);
+        keywords.put("class", TokenType.CLASS);
+        keywords.put("else", TokenType.ELSE);
+        keywords.put("false", TokenType.FALSE);
+        keywords.put("for", TokenType.FOR);
+        keywords.put("fun", TokenType.FUN);
+        keywords.put("if", TokenType.IF);
+        keywords.put("nil", TokenType.NIL);
+        keywords.put("or", TokenType.OR);
+        keywords.put("print", TokenType.PRINT);
+        keywords.put("return", TokenType.RETURN);
+        keywords.put("super", TokenType.SUPER);
+        keywords.put("this", TokenType.THIS);
+        keywords.put("true", TokenType.TRUE);
+        keywords.put("var", TokenType.VAR);
+        keywords.put("while", TokenType.WHILE);
+    }
+
     Scanner(String source) {
         this.source = source;
     }
@@ -70,6 +92,18 @@ class Scanner {
                 if (match('/')) {
                     // A comment goes until the end of the line.
                     while (peek() != '\n' && !isAtEnd()) advance();
+                } else if (match('*')) {
+                    // add support for nested comments?
+                    while (!isAtEnd()) {
+                        if (peek() == '\n') line++;
+                        advance();
+                    }
+                    if (peek() != '*' && peekNext() != '/') {
+                        advance();
+                        advance();
+                    } else {
+                        // add error?
+                    }
                 } else {
                     addToken(TokenType.SLASH);
                 }
@@ -88,11 +122,20 @@ class Scanner {
                 break;
 
             case '"': string(); break;
+            case 'o':
+                if (match('r')) {
+                    addToken(TokenType.OR);
+                }
+                break;
 
 
             default:
                 if (isDigit(c)) {
                     number();
+                }
+                // we assume any lexeme starting with _ or a letterr is an idenntifierr
+                else if (isAlpha(c)) {
+                    identifier();
                 } else {
                     Lox.error(line, "Unexpected character.");
                 }
@@ -100,6 +143,15 @@ class Scanner {
 
         }
 
+    }
+
+    private void identifier() {
+        while (isAlphaNumeric(peek())) advance();
+
+        String text = source.substring(start, current);
+        TokenType type = keywords.get(text);
+        if (type == null) type = TokenType.IDENTIFIER;
+        addToken(type);
     }
 
     //similar to strings
@@ -171,17 +223,29 @@ class Scanner {
     }
 
     // lookahead
-    // making peek take a parameter would allow arbitrarily far lookaheads
+    // making peek take a parameter would allow arbitrarily far lookaheads.
     // although it's possible to provide a boolean parameter?
     private char peek() {
         if (isAtEnd()) return '\0';
         return source.charAt(current);
     }
+
     // we need a second character of lookahead when workijng with decimal numbers
     private char peekNext() {
         if (current + 1 >= source.length()) return '\0';
         return source.charAt(current + 1);
     }
+
+    private boolean isAlpha(char c) {
+        return (c >= 'a' && c <= 'z') ||
+                (c >= 'A' && c <= 'Z') ||
+                c == '_';
+    }
+
+    private boolean isAlphaNumeric(char c) {
+        return isAlpha(c) || isDigit(c);
+    }
+
     /*
     Java's Character.isDigit() allows Devangaeru digits,
     full-width (Chinese, JP, KR) numbers and other stuff we don't want
