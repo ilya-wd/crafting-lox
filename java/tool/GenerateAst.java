@@ -45,6 +45,9 @@ public class GenerateAst {
         writer.println();
         writer.println("abstract class " + baseName + " {");
 
+        defineVisitor(writer, baseName, types);
+
+
         // The AST (sub)classes
         for (String type : types) {
             String className = type.split(":")[0].trim();
@@ -52,11 +55,29 @@ public class GenerateAst {
             defineType(writer, baseName, className, fields);
         }
 
+        // The class base accept() method.
+        writer.println();
+        writer.println("  abstract <R> R accept(Visitor<R> visitor);");
+
+
         writer.println("}");
         writer.close();
 //        } catch (FileNotFoundException e) {
 //            e.printStackTrace();
 //        }
+    }
+
+    private static void defineVisitor(
+            PrintWriter writer, String baseName, List<String> types) {
+        writer.println("  interface Visitor<R> {");
+
+        for (String type : types) {
+            String typeName = type.split(":")[0].trim();
+            writer.println("    R visit" + typeName + baseName + "(" +
+                    typeName + " " + baseName.toLowerCase() + ");");
+        }
+
+        writer.println("  }");
     }
 
     private static void defineType(
@@ -75,6 +96,14 @@ public class GenerateAst {
             writer.println("      this." + name + " = " + name + ";");
         }
 
+        writer.println("    }");
+
+        // Visitor pattern.
+        writer.println();
+        writer.println("    @Override");
+        writer.println("    <R> R accept(Visitor<R> visitor) {");
+        writer.println("      return visitor.visit" +
+                className + baseName + "(this);");
         writer.println("    }");
 
         // Fields.
