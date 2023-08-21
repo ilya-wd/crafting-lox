@@ -2,6 +2,7 @@ package lox;
 
 import java.util.List;
 
+// Class for defining the structure of the code representation for the parser
 abstract class Expr {
   interface Visitor<R> {
     R visitBinaryExpr(Binary expr);

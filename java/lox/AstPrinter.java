@@ -1,6 +1,6 @@
 package lox;
 
-// Will print Lisp-like representation of abstract syntex tree
+// Will print Lisp-like representation of abstract syntax tree
 class AstPrinter implements Expr.Visitor<String> {
     String print(Expr expr) {
         return expr.accept(this);
@@ -34,6 +34,8 @@ class AstPrinter implements Expr.Visitor<String> {
         builder.append("(").append(name);
         for (Expr expr : exprs) {
             builder.append(" ");
+            // the recursive step below lets us print an entire tree by passing ...
+            // ... in itself (parenthesize) when calling accept() on each subexpression
             builder.append(expr.accept(this));
         }
         builder.append(")");

@@ -10,7 +10,7 @@ import java.util.List;
 /*
     Declares each field in the class body
     Declares a constructor for the class with parameters for each field
-    Initializes parameters inn the body
+    Initializes parameters in the body
     ...
  */
 public class GenerateAst {
