@@ -62,16 +62,36 @@ class Scanner {
     private void scanToken() {
         char c = advance();
         switch (c) {
-            case '(': addToken(TokenType.LEFT_PAREN); break;
-            case ')': addToken(TokenType.RIGHT_PAREN); break;
-            case '{': addToken(TokenType.LEFT_BRACE); break;
-            case '}': addToken(TokenType.RIGHT_BRACE); break;
-            case ',': addToken(TokenType.COMMA); break;
-            case '.': addToken(TokenType.DOT); break;
-            case '-': addToken(TokenType.MINUS); break;
-            case '+': addToken(TokenType.PLUS); break;
-            case ';': addToken(TokenType.SEMICOLON); break;
-            case '*': addToken(TokenType.STAR); break;
+            case '(':
+                addToken(TokenType.LEFT_PAREN);
+                break;
+            case ')':
+                addToken(TokenType.RIGHT_PAREN);
+                break;
+            case '{':
+                addToken(TokenType.LEFT_BRACE);
+                break;
+            case '}':
+                addToken(TokenType.RIGHT_BRACE);
+                break;
+            case ',':
+                addToken(TokenType.COMMA);
+                break;
+            case '.':
+                addToken(TokenType.DOT);
+                break;
+            case '-':
+                addToken(TokenType.MINUS);
+                break;
+            case '+':
+                addToken(TokenType.PLUS);
+                break;
+            case ';':
+                addToken(TokenType.SEMICOLON);
+                break;
+            case '*':
+                addToken(TokenType.STAR);
+                break;
             case '!':
                 addToken(match('=') ? TokenType.BANG_EQUAL : TokenType.BANG);
                 break;
@@ -119,7 +139,9 @@ class Scanner {
                 line++;
                 break;
 
-            case '"': string(); break;
+            case '"':
+                string();
+                break;
             case 'o':
                 if (match('r')) {
                     addToken(TokenType.OR);
@@ -197,7 +219,7 @@ class Scanner {
         System.out.println(counter++); // 1 (returned first then incremented)
         System.out.println(counter++); // 2
         var anotherCounter = 1;
-        System.out.println(++counter); // 2 (incremented first then returned)
+        System.out.println(++anotherCounter); // 2 (incremented first then returned)
          */
         return source.charAt(current++);
     }
@@ -228,7 +250,7 @@ class Scanner {
         return source.charAt(current);
     }
 
-    // we need a second character of lookahead when workijng with decimal numbers
+    // we need a second character of lookahead when working with decimal numbers
     private char peekNext() {
         if (current + 1 >= source.length()) return '\0';
         return source.charAt(current + 1);
