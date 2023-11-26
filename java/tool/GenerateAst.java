@@ -28,6 +28,11 @@ public class GenerateAst {
                 "Unary    : Token operator, Expr right"
         ));
 
+        defineAst(outputDir, "Stmt", Arrays.asList(
+                "Expression : Expr expression",
+                "Print      : Expr expression"
+        ));
+
     }
 
     // the first thing it does is outputting Expr class
@@ -35,36 +40,36 @@ public class GenerateAst {
             String outputDir, String baseName, List<String> types)
             throws IOException {
         String path = outputDir + "/" + baseName + ".java";
-//        try {
-        PrintWriter writer = new PrintWriter(path, "UTF-8");
+        try {
+            PrintWriter writer = new PrintWriter(path, "UTF-8");
 
 
-        writer.println("package lox;");
-        writer.println();
-        writer.println("import java.util.List;");
-        writer.println();
-        writer.println("abstract class " + baseName + " {");
+            writer.println("package lox;");
+            writer.println();
+            writer.println("import java.util.List;");
+            writer.println();
+            writer.println("abstract class " + baseName + " {");
 
-        defineVisitor(writer, baseName, types);
+            defineVisitor(writer, baseName, types);
 
 
-        // The AST (sub)classes
-        for (String type : types) {
-            String className = type.split(":")[0].trim();
-            String fields = type.split(":")[1].trim();
-            defineType(writer, baseName, className, fields);
+            // The AST (sub)classes
+            for (String type : types) {
+                String className = type.split(":")[0].trim();
+                String fields = type.split(":")[1].trim();
+                defineType(writer, baseName, className, fields);
+            }
+
+            // The class base accept() method.
+            writer.println();
+            writer.println("  abstract <R> R accept(Visitor<R> visitor);");
+
+
+            writer.println("}");
+            writer.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
-
-        // The class base accept() method.
-        writer.println();
-        writer.println("  abstract <R> R accept(Visitor<R> visitor);");
-
-
-        writer.println("}");
-        writer.close();
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
     }
 
     private static void defineVisitor(
